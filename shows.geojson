@@ -1,0 +1,19 @@
+{
+"type": "FeatureCollection",
+"name": "shows",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "fid": 1, "id": 1, "date": "07.02.2019", "show": "Amphion Open", "lat": 51.968602334397048, "long": 6.2877226269838449 }, "geometry": { "type": "Point", "coordinates": [ 6.287722626983845, 51.968602334397048 ] } },
+{ "type": "Feature", "properties": { "fid": 2, "id": 2, "date": "13.08.2019", "show": "Stadsfeest Doetinchem", "lat": 51.965465119152569, "long": 6.2879935981468682 }, "geometry": { "type": "Point", "coordinates": [ 6.287993598146868, 51.965465119152569 ] } },
+{ "type": "Feature", "properties": { "fid": 3, "id": 3, "date": "19.09.2019", "show": "Het Arsenaal (Doesburg)", "lat": 52.012986847900606, "long": 6.135156974364631 }, "geometry": { "type": "Point", "coordinates": [ 6.135156974364631, 52.012986847900606 ] } },
+{ "type": "Feature", "properties": { "fid": 4, "id": 4, "date": "12.06.2022", "show": "Manana Manana festival", "lat": 52.207135364078887, "long": 6.3463044008813831 }, "geometry": { "type": "Point", "coordinates": [ 6.346304400881383, 52.207135364078887 ] } },
+{ "type": "Feature", "properties": { "fid": 5, "id": 5, "date": "10.09.2022", "show": "Rabo On Stage (shouwburg Lochem)", "lat": 52.160316014847957, "long": 6.4177077693107059 }, "geometry": { "type": "Point", "coordinates": [ 6.417707769310706, 52.160316014847957 ] } },
+{ "type": "Feature", "properties": { "fid": 6, "id": 6, "date": "12.11.2022", "show": "Oerkroeg Schiller (DAP)", "lat": 51.927969615142239, "long": 6.5842181018531321 }, "geometry": { "type": "Point", "coordinates": [ 6.584218101853132, 51.927969615142239 ] } },
+{ "type": "Feature", "properties": { "fid": 7, "id": 7, "date": "18.11.2022", "show": "Get A Grip/regio8 (Doetinchem)", "lat": 51.961375121375887, "long": 6.2925439362486939 }, "geometry": { "type": "Point", "coordinates": [ 6.292543936248694, 51.961375121375887 ] } },
+{ "type": "Feature", "properties": { "fid": 8, "id": 8, "date": "27.03.2023", "show": "DRU poppodium (Achterhoekse Band Competitie)", "lat": 51.895474307404314, "long": 6.3839412241595479 }, "geometry": { "type": "Point", "coordinates": [ 6.383941224159548, 51.895474307404314 ] } },
+{ "type": "Feature", "properties": { "fid": 9, "id": 9, "date": "15.04.2023", "show": "Rock Café Taste", "lat": 52.040192792263163, "long": 6.6190482222375939 }, "geometry": { "type": "Point", "coordinates": [ 6.619048222237594, 52.040192792263163 ] } },
+{ "type": "Feature", "properties": { "fid": 10, "id": 10, "date": "27.04.2023", "show": "Beapop", "lat": 51.891565993415455, "long": 6.3839467709040463 }, "geometry": { "type": "Point", "coordinates": [ 6.383946770904046, 51.891565993415455 ] } }
+]
+}
+
+

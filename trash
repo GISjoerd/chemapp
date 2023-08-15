@@ -1,0 +1,47 @@
+# create geodataframe of locations
+    data = pd.DataFrame({
+    'lon': [-58, 2, 145, 30.32, -4.03, -73.57, 36.82, -38.5],
+    'lat': [-34, 49, -38, 59.93, 5.33, 45.52, -1.29, -12.97],
+    'name': ['Buenos Aires', 'Paris', 'Melbourne', 'St Petersburg', 'Abidjan', 'Montreal', 'Nairobi', 'Salvador'],
+    'value': [10, 12, 40, 70, 23, 43, 100, 43]
+    })
+
+    # add markers of geodataframe to the map
+    for i in range(len(data)):
+        folium.Marker(
+            location=[data.iloc[i]['lat'], data.iloc[i]['lon']],
+            popup=data.iloc[i]['name'],
+        ).add_to(mc)
+
+
+ folium.Marker(
+        location = [52.022727853219074, 6.421852949418699],
+        popup="</i>Marker here<i>",
+        tooltip="Click Here!",
+        icon=folium.map.Icon(color='green')
+    ).add_to(mc)
+
+
+
+@app.route("/member", methods=["POST","GET"])
+def member():
+    email =None
+    if "member"in session:
+        member = session["member"]
+
+        if request.method == "POST":
+            email = request.form["email"]
+            session["email"] = email
+
+            # save email to database
+            new_member = Member(email=email)
+            db.session.add(new_member)
+            db.session.commit()
+
+        flash("congrats!! You are now a member of the Chemical Cloud")
+        else:
+             if "email" in session:
+                email = session["email"]
+        return render_template("member.html", email=email)
+    else:
+        return redirect(url_for("member"))

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Chemical Clouds</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<body id="chemical clouds" data-spy="scroll" data-target=".navbar" data-offset="50">
+
+<!--Nav bar-->
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">Chemical Clouds</a>
+      </div>
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="/">Home</a></li>
+        <li><a Class=""href="/iframe">Map</a></li>
+        <li><a class=""href="/music">Music</a></li>
+        <li><a class=""href="/merch">Merch</a></li>
+        <li><a class=""href="/contact">Contact</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/member"><span class="glyphicon glyphicon-user"></span> Member Ship</a></li>
+        <li><a href="#"><span class="glyphicon glyphicon-shopping-cart"></span> Cart</a></li>
+      </ul>
+    </div>
+    </div>
+  </nav>
+
+{% block home %}
+    <!-- template homepagepicture -->
+{% endblock home %}
+
+{% block iframe %}
+<!-- tempalte map view in iframe-->
+{% endblock iframe %}
+
+{% block music %}
+<!-- template music page-->
+{% endblock music %}
+
+{% block merch %}
+<!-- template merch-->
+{% endblock merch %}
+
+
+{% block contact %}
+<!-- tempalte contact page-->
+{% endblock contact %}
+
+{% block footer %}
+<!-- tempalte footer-->
+{% endblock footer %}
+
+
+  <div class="container-fluid">
+    {% block email %}
+    {% endblock email %}
+  </div>
+
+
+</body>
+</html>
+
+

@@ -1,0 +1,67 @@
+<style>
+
+
+.container {
+  padding-top: 250px;
+}
+
+.text-center {
+
+}
+
+  .carousel-inner img {
+    -webkit-filter: grayscale(0%);
+    filter: grayscale(0%); /* make all photos black and white */
+    width: 100%; /* Set width to 100% */
+  }
+
+  .item {
+    height: 800px;
+  }
+
+  .navbar {
+    min-height: 100px;
+  }
+
+  .navbar-brand {
+    padding: 0 15px;
+    height: 100px;
+    line-height: 100px;
+  }
+
+  .navbar-toggle {
+    /* (100px - button height 34px) / 2 = 33px */
+    margin-top: 33px;
+    padding: 9px 10px !important;
+  }
+
+  @media (min-width: 768px) {
+    .navbar-nav > li > a {
+      /* (100px - line-height of 27px) / 2 = 35.5px */
+      padding-top: 35.5px;
+      padding-bottom: 35.5px;
+      line-height: 27px;
+    }
+  }
+
+
+.bg-1 {
+  padding-top: 100px;
+  background: #2d2d30;
+  color: #bdbdbd;
+  
+}
+
+.bg-1 h3 {color: #fff;}
+.bg-1 p {font-style: italic;}
+
+.row {
+  padding-top: 100px;
+  background: #2d2d30;
+  color: #bdbdbd;
+  height: 1000px;
+
+}
+
+
+  </style>

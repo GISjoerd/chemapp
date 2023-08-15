@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+    {% block iframe %}
+    <div id="music" class="bg-1">
+        <div class="container-fluid">
+          <h1 class="text-center">Using iframe</h1>
+          <br>
+          <br>
+          <div style="display: flex; justify-content: center;">
+          {{ iframe|safe }}
+        </div>
+    {% endblock iframe %}

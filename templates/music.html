@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+    {% block music %}
+
+<div id="music" class="bg-1">
+    <div class="container-fluid">
+
+        <br>
+        <br>
+
+
+        <div style="display: flex;">
+          <div style="width: 60%; margin-right: 10px;">
+        <iframe width="100%" height="500" src="https://www.youtube.com/embed/iJX9SEAddsk"
+        title="YouTube video player" frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>
+        </iframe>
+        </div>
+        <div style= "width: 40%">
+          <h3 class="text-center">Music I love</h3>
+          <p class="text-center">This spotify playlist contains modern rock music, one of the gernges I admier the most. All the music that is in this list has a mystirouse tint.
+            <br> Feel free to take a listen!</p>
+
+        <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/0RraB7uzBhKX9vZnLSkpSK?utm_source=generator"
+        width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy"></iframe>
+      </div>
+  </div>
+  {% endblock music %}
+
+
