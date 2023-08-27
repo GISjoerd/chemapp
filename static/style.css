@@ -43,8 +43,9 @@
 
 .bg-1 {
   padding-top: 100px;
-  background: #2d2d30;
-  color: #bdbdbd;
+  background: #000000;
+  color: #ffffff;
+  height: 1000px;
   
 }
 
@@ -53,8 +54,8 @@
 
 .row {
   padding-top: 100px;
-  background: #2d2d30;
-  color: #bdbdbd;
+  background: #000000;
+  color: #ffffff;
   height: 1000px;
 
 }
