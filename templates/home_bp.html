@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-  {% block home %}
+  {% block home_bp %}
     <!-- homepagepicture -->
     <div class="carousel-inner" role="listbox">
       <div class="item active">
-        <img src="/static/Chemical clouds 1.jpg" alt="band">
+        <img src="{{ url_for('static', filename='cc.jpg') }}" alt="band">
       </div>
     </div>
-    {% endblock home %}
+    {% endblock home_bp %}
 
 
 
