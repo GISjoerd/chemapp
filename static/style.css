@@ -1,13 +1,9 @@
 <style>
 
 
-.container {
+  .container {
   padding-top: 250px;
-}
-
-.text-center {
-
-}
+  }
 
   .carousel-inner img {
     -webkit-filter: grayscale(0%);

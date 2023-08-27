@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
@@ -19,11 +19,10 @@
         <a class="navbar-brand" href="#">Chemical Clouds</a>
       </div>
       <ul class="nav navbar-nav">
-        <li class="active"><a href="/">Home</a></li>
-        <li><a Class=""href="/iframe">Map</a></li>
-        <li><a class=""href="/music">Music</a></li>
-        <li><a class=""href="/merch">Merch</a></li>
-        <li><a class=""href="/contact">Contact</a></li>
+        <li class="active"><a href="{{ url_for('home_bp.home') }}">Home</a></li>
+        <li><a class="" href="{{ url_for('map_bp.map') }}">Map</a></li>
+        <li><a class="" href="{{ url_for('music_bp.music') }}">Music</a></li>
+        <li><a class=""href="{{ url_for('mail_bp.mail') }}">Mail</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="/member"><span class="glyphicon glyphicon-user"></span> Member Ship</a></li>
@@ -33,9 +32,9 @@
     </div>
   </nav>
 
-{% block home %}
+{% block home_bp %}
     <!-- template homepagepicture -->
-{% endblock home %}
+{% endblock home_bp %}
 
 {% block iframe %}
 <!-- tempalte map view in iframe-->
