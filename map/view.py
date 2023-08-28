@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template
-import folium
 from folium.plugins import MarkerCluster
+import folium
+import json
 
 map_bp = Blueprint('map_bp', __name__, template_folder = "templates", static_folder = "static", url_prefix = "/map") 
     # route to homepage
@@ -36,7 +37,34 @@ def map():
 
  # add gejson to map
     shows = "shows.geojson"
-    folium.GeoJson(shows).add_to(mc)
+    
+
+     # Read the geojson file as a dictionary
+    
+    with open(shows) as f:
+        data = json.load(f)
+
+      # Loop through the features in the geojson file and create markers with popups
+    for feature in data["features"]:
+        # Get the coordinates, name and image of each feature
+        coords = feature["geometry"]["coordinates"]
+        name = feature["properties"]["show"]
+        img = feature["properties"]["img"]
+        
+        # Create an HTML string for the popup
+        html = f"<h3>{name}</h3><img src='{img}' width='300' height='200'>"
+
+        # Create an iframe object from the HTML string
+        iframe = folium.IFrame(html=html, width=350, height=250)
+
+        # Create a popup object from the iframe object
+        popup = folium.Popup(iframe, max_width=350)
+
+        # Create a marker object with the popup
+        marker = folium.Marker(location=[coords[1], coords[0]], popup=popup)
+
+        # Add the marker to the marker cluster
+        marker.add_to(mc)
 
      # set iframe width and heigth
     m.get_root().width ="1500px"
