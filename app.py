@@ -6,6 +6,7 @@ from mail.view import mail_bp
 
 def create_app():
     app = Flask(__name__)
+
     app.register_blueprint(home_bp)
     app.register_blueprint(map_bp)
     app.register_blueprint(music_bp)
