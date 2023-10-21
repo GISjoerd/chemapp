@@ -49,10 +49,9 @@ def map():
         # Get the coordinates, name and image of each feature
         coords = feature["geometry"]["coordinates"]
         name = feature["properties"]["show"]
-        img = feature["properties"]["img"]
         
         # Create an HTML string for the popup
-        html = f"<h3>{name}</h3><img src='{img}' width='300' height='200'>"
+        html = f"<h3>{name}</h3>' width='300' height='200'>"
 
         # Create an iframe object from the HTML string
         iframe = folium.IFrame(html=html, width=350, height=250)
