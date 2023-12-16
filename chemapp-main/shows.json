@@ -1,0 +1,30 @@
+
+
+
+
+
+
+
+
+
+{
+    "name": "Manana Manana festival",
+    "date": "2022-06-12",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [6.346304400881383, 52.207135364078887]
+    }
+    
+  },
+
+  {
+    "name": "Rabo On Stage (schouwburg Lochem)",
+    "date": "2022-09-10",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [6.417707769310706, 52.160316014847957]
+    }
+    
+  },
+
+  
