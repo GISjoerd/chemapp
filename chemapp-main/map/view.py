@@ -1,12 +1,20 @@
-from flask import Blueprint, render_template
-from folium.plugins import MarkerCluster
 import folium
 import json
+from shapely.wkt import loads
+from flask import Blueprint, render_template
+from folium.plugins import MarkerCluster
+from database.view import get_db_connection
 
 map_bp = Blueprint('map_bp', __name__, template_folder = "templates", static_folder = "static", url_prefix = "/map") 
     # route to homepage
+
+
 @map_bp.route("/map_bp")
 def map():
+    #Execute a SQL query to retrive the data from database
+    conn= get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT*FROM show")
 
     m = folium.Map(
     # coordinaten achterhoek
@@ -26,7 +34,7 @@ def map():
 
     mc = MarkerCluster().add_to(m)
 
-         # Sets Tile Theme to one of:
+    # Sets Tile Theme to one of:
     # Stamen Toner
     # Stamen Terrain
     # cartodbpositron
@@ -34,40 +42,39 @@ def map():
     #MapQuest Open Aerial
     folium.TileLayer('cartodbdark_matter').add_to(mc)
 
-
- # add gejson to map
-    shows = "shows.geojson"
     
+      # Loop through the rows in the database show
+    for row in cur.fetchall():
+        name = row[1]
+        geometry = row[3]
 
-     # Read the geojson file as a dictionary
-    
-    with open(shows) as f:
-        data = json.load(f)
+        #Convert binary geometry to WKT using ST_AsText in SQL
+        cur.execute("SELECT ST_AsText(%s)", (geometry,))
+        wkt_result= cur.fetchone()
+        if wkt_result:
+            geometry_wkt = wkt_result[0]
+            point =loads(geometry_wkt)
 
-      # Loop through the features in the geojson file and create markers with popups
-    for feature in data["features"]:
-        # Get the coordinates, name and image of each feature
-        coords = feature["geometry"]["coordinates"]
-        name = feature["properties"]["show"]
-        
+            lat, long = point.xy
+
+            lat = lat[0]
+            long = long[0]
+
         # Create an HTML string for the popup
-        html = f"<h3>{name}</h3>' width='300' height='200'>"
-
-        # Create an iframe object from the HTML string
+        html = f"<h3>{name}</h3>" 
         iframe = folium.IFrame(html=html, width=350, height=250)
-
-        # Create a popup object from the iframe object
         popup = folium.Popup(iframe, max_width=350)
-
-        # Create a marker object with the popup
-        marker = folium.Marker(location=[coords[1], coords[0]], popup=popup)
-
-        # Add the marker to the marker cluster
+        
+        #lat and long has been turend around
+        marker = folium.Marker(location=[long, lat], popup=popup)
         marker.add_to(mc)
 
      # set iframe width and heigth
     m.get_root().width ="1500px"
     m.get_root().height = "800px"
     iframe = m.get_root()._repr_html_()
+
+    cur.close()
+    conn.close()
 
     return render_template("map_bp.html", iframe=iframe)
