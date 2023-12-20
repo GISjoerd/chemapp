@@ -1,10 +1,16 @@
 {% extends "base.html" %}
   {% block home_bp %}
+  <br>
+  <br>
+  <br>
+  <a href="{{ url_for('about_bp.about') }}" class="btn btn-primary" style="position: absolute; top: 500px; right: 500px; z-index: 1;">About</a>
     <!-- homepagepicture -->
     <div class="carousel-inner" role="listbox">
       <div class="item active">
+        <button type="button" class="btn btn-primary">About</button>
         <img src="{{ url_for('static', filename='cc.jpg') }}" alt="band">
-        <a href="#about">About</a> 
+
+        
       </div>
     </div>
     {% endblock home_bp %}
