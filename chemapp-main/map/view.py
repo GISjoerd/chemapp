@@ -71,14 +71,40 @@ def map():
         html += f'<a href="http://127.0.0.1:5000/info_bp"onclick="openPage(\'{current_app.url_for("info_bp.info")}\')"target="_blank">info</a>'
 
         # Using JavaScript function to handle opening hyperlink to another page
-        javascript_function = '''
+        javascript_openpage_function = '''
             <script>
                 function openPage(url) {
                     window.location.href = url;
                 }
             </script>
         '''
-        html += javascript_function
+        html += javascript_openpage_function
+
+        # Using javascript to create a list of all markers
+        javascript_openpopup_function = '''
+            <script>
+                function showPopup(id) {
+                    //find the marker on the map with the given id
+                    var marker = findMarkerById(id);
+
+                    // Open the popup for the marker 
+                    marker.openPopup();
+                }
+
+                function findMarkerByID(id) {
+                // loop through all the markers opn the map
+                for (var i = 0; i < markers.lenght; i++) {
+                    // Check if the marker has the given id
+                    if (markers[i].options.name == id) {
+                        return markers[i];
+                    }
+                }
+                // Return null if no marker was found
+                return null
+            }
+        </script>   
+    '''
+        html+ javascript_openpopup_function
 
 
         iframe = folium.IFrame(html=html, width=350, height=250)
@@ -88,7 +114,7 @@ def map():
         marker.add_to(mc)
 
      # set iframe width and heigth
-    m.get_root().width ="1500px"
+    m.get_root().width ="1000px"
     m.get_root().height = "800px"
     iframe = m.get_root()._repr_html_()
 
