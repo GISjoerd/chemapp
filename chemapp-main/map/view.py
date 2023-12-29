@@ -1,12 +1,12 @@
 import folium
-import json
 from shapely.wkt import loads
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, url_for, current_app
 from folium.plugins import MarkerCluster
 from database.view import get_db_connection
 
 map_bp = Blueprint('map_bp', __name__, template_folder = "templates", static_folder = "static", url_prefix = "/map") 
-    # route to homepage
+
+
 
 
 @map_bp.route("/map_bp")
@@ -46,11 +46,14 @@ def map():
       # Loop through the rows in the database show
     for row in cur.fetchall():
         name = row[1]
+        date = row[2]
         geometry = row[3]
+        
 
         #Convert binary geometry to WKT using ST_AsText in SQL
         cur.execute("SELECT ST_AsText(%s)", (geometry,))
         wkt_result= cur.fetchone()
+
         if wkt_result:
             geometry_wkt = wkt_result[0]
             point =loads(geometry_wkt)
@@ -61,10 +64,25 @@ def map():
             long = long[0]
 
         # Create an HTML string for the popup
-        html = f"<h3>{name}</h3>" 
+
+        html = f"<h3>{name}</h3>"
+        html += f"<h3>{date}</h3>"
+        html += f'<img src="{url_for("static", filename="cc_resize.jpg")}" alt="band">'
+        html += f'<a href="http://127.0.0.1:5000/info_bp"onclick="openPage(\'{current_app.url_for("info_bp.info")}\')"target="_blank">info</a>'
+
+        # Using JavaScript function to handle opening hyperlink to another page
+        javascript_function = '''
+            <script>
+                function openPage(url) {
+                    window.location.href = url;
+                }
+            </script>
+        '''
+        html += javascript_function
+
+
         iframe = folium.IFrame(html=html, width=350, height=250)
-        popup = folium.Popup(iframe, max_width=350)
-        
+        popup = folium.Popup(iframe)
         #lat and long has been turend around
         marker = folium.Marker(location=[long, lat], popup=popup)
         marker.add_to(mc)
