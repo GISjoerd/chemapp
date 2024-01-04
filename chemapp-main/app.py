@@ -7,7 +7,6 @@ from music.view import music_bp
 from mail.view import mail_bp
 from database.view import database_bp
 
-
 app = Flask(__name__)
 
 app.register_blueprint(home_bp)
