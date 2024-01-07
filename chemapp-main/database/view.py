@@ -38,7 +38,7 @@ def format_show(show):
         "geometry": show.geometry
     }
 
-@app.route('/show', methods = ['POST', 'GET'])
+@app.route('/show', methods = ['POST'])
 def create_show():
     data = request.json
     name, date, geometry = data['name'], data['date'], data['geometry']
