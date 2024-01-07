@@ -16,6 +16,7 @@ def map():
     cur = conn.cursor()
     cur.execute("SELECT*FROM show")
 
+
     m = folium.Map(
     # coordinaten achterhoek
         location=[52.022727853219074, 6.421852949418699],
@@ -91,9 +92,9 @@ def map():
                     marker.openPopup();
                 }
 
-                function findMarkerByID(id) {
+                function findMarkerById(id) {
                 // loop through all the markers opn the map
-                for (var i = 0; i < markers.lenght; i++) {
+                for (var i = 0; i < markers.length; i++) {
                     // Check if the marker has the given id
                     if (markers[i].options.name == id) {
                         return markers[i];
@@ -104,7 +105,7 @@ def map():
             }
         </script>   
     '''
-        html+ javascript_openpopup_function
+        html += javascript_openpopup_function
 
 
         iframe = folium.IFrame(html=html, width=350, height=250)
@@ -113,12 +114,19 @@ def map():
         marker = folium.Marker(location=[long, lat], popup=popup)
         marker.add_to(mc)
 
+        #creating a list of show (events) using html+javascript
+          
      # set iframe width and heigth
     m.get_root().width ="1000px"
     m.get_root().height = "800px"
     iframe = m.get_root()._repr_html_()
 
+
+
+    shows = cur.fetchall()
+   
+
     cur.close()
     conn.close()
-
-    return render_template("map_bp.html", iframe=iframe)
+    print(shows)
+    return render_template("map_bp.html", iframe=iframe, shows=shows)
