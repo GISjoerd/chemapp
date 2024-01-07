@@ -118,7 +118,7 @@ def map():
           
      # set iframe width and heigth
     m.get_root().width ="1000px"
-    m.get_root().height = "800px" 
+    m.get_root().height = "800px"
     iframe = m.get_root()._repr_html_()
 
 
