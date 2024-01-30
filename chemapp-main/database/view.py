@@ -46,4 +46,5 @@ def create_show():
     sql = 'INSERT INTO public.show(name, date, geometry) VALUES (%s, %s, ST_GeomFromGeoJSON(%s))'
     cur.execute(sql, (name, date, geometry_insert))
     conn.commit()
- 
+    
+    return "Show created successfully", 201
