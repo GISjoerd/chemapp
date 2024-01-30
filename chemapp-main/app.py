@@ -8,7 +8,9 @@ from music.view import music_bp
 from mail.view import mail_bp
 from database.view import database_bp
 
-app = Flask(__name__)
+ 
+
+app = Flask(__name__)   
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Spalstraat%4025@localhost/CC_shows'
 db = SQLAlchemy(app)
 
@@ -16,9 +18,10 @@ def create_tables():
     with app.app_context():
         db.create_all()
 
-# Manually call the function to create tables before the first request
+# Call the function to create tables before the first request
 create_tables()
 
+#register blueprints
 app.register_blueprint(home_bp)
 app.register_blueprint(about_bp)
 app.register_blueprint(map_bp)

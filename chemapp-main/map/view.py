@@ -1,11 +1,12 @@
 import folium
+import json
 from shapely.wkt import loads
 from flask import Blueprint, render_template, url_for, current_app
 from folium.plugins import MarkerCluster
 from database.view import get_db_connection
 
-map_bp = Blueprint('map_bp', __name__, template_folder = "templates", static_folder = "static", url_prefix = "/map") 
 
+map_bp = Blueprint('map_bp', __name__, template_folder = "templates", static_folder = "static", url_prefix = "/map") 
 
 
 
@@ -15,7 +16,10 @@ def map():
     conn= get_db_connection()
     cur = conn.cursor()
     cur.execute("SELECT*FROM show")
-
+    #creatingting shows to use later in code
+    shows = cur.fetchall()
+    
+    
 
     m = folium.Map(
     # coordinaten achterhoek
@@ -33,19 +37,21 @@ def map():
     line_opacity=0.5,
     ).add_to(m)
 
-    mc = MarkerCluster().add_to(m)
+    mc = MarkerCluster()
 
     # Sets Tile Theme to one of:
     # Stamen Toner
-    # Stamen Terrain
+    # stamenterrain
     # cartodbpositron
     #cartodbdark_matter
     #MapQuest Open Aerial
     folium.TileLayer('cartodbdark_matter').add_to(mc)
 
+    markers = []  # Initialize markers array to keep track of added markers
     
       # Loop through the rows in the database show
-    for row in cur.fetchall():
+    for row in shows:
+        id = row[0]
         name = row[1]
         date = row[2]
         geometry = row[3]
@@ -65,11 +71,15 @@ def map():
             long = long[0]
 
         # Create an HTML string for the popup
-
-        html = f"<h3>{name}</h3>"
+        html = '<iframe width="100%" height="300" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1731040173&color=%235474a0&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/user-889499625" title="sjoerd" target="_blank" style="color: #cccccc; text-decoration: none;">sjoerd</a> · <a href="https://soundcloud.com/user-889499625/fjords1" title="Fjords" target="_blank" style="color: #cccccc; text-decoration: none;">Fjords</a></div><br><img src="https://www.w3schools.com/w3images/lights.jpg" alt="Lights" style="width:100%">'
+        html += f"<h3>{name}</h3>"
         html += f"<h3>{date}</h3>"
+        html += f"<h3>{id}</h3>"
         html += f'<img src="{url_for("static", filename="cc_resize.jpg")}" alt="band">'
-        html += f'<a href="http://127.0.0.1:5000/info_bp"onclick="openPage(\'{current_app.url_for("info_bp.info")}\')"target="_blank">info</a>'
+        #html += f'<a href="http://127.0.0.1:5000/info_bp"onclick="openPage(\'{current_app.url_for("info_bp.info")}\')"target="_blank">info</a>'
+        html += f'<a href="http://127.0.0.1:5000/info_bp" onclick="openPage(\'{current_app.url_for("info_bp.info")}\')" target="_blank">info</a>'
+    
+        
 
         # Using JavaScript function to handle opening hyperlink to another page
         javascript_openpage_function = '''
@@ -79,54 +89,27 @@ def map():
                 }
             </script>
         '''
-        html += javascript_openpage_function
-
-        # Using javascript to create a list of all markers
-        javascript_openpopup_function = '''
-            <script>
-                function showPopup(id) {
-                    //find the marker on the map with the given id
-                    var marker = findMarkerById(id);
-
-                    // Open the popup for the marker 
-                    marker.openPopup();
-                }
-
-                function findMarkerById(id) {
-                // loop through all the markers opn the map
-                for (var i = 0; i < markers.length; i++) {
-                    // Check if the marker has the given id
-                    if (markers[i].options.name == id) {
-                        return markers[i];
-                    }
-                }
-                // Return null if no marker was found
-                return null
-            }
-        </script>   
-    '''
-        html += javascript_openpopup_function
-
-
+        html+= javascript_openpage_function
         iframe = folium.IFrame(html=html, width=350, height=250)
         popup = folium.Popup(iframe)
         #lat and long has been turend around
-        marker = folium.Marker(location=[long, lat], popup=popup)
+        marker = folium.Marker(location=[long, lat], popup=popup, custom_id=int(id))
         marker.add_to(mc)
 
         #creating a list of show (events) using html+javascript
-          
+        markers.append(marker)  # Add the marker to the markers array
+
+    mc.add_to(m) #add the mc to main map
+    
+
      # set iframe width and heigth
     m.get_root().width ="1000px"
-    m.get_root().height = "800px"
+    m.get_root().height = "650px"
     iframe = m.get_root()._repr_html_()
-
-
-
-    shows = cur.fetchall()
+    print(shows)
+    print(markers)
    
-
     cur.close()
     conn.close()
-    print(shows)
-    return render_template("map_bp.html", iframe=iframe, shows=shows)
+    return render_template("map_bp.html", iframe=iframe, shows=shows, lat=lat, long=long, markers = markers)
+ 

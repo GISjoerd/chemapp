@@ -1,25 +1,26 @@
 {% extends "base.html" %}
 
 {% block iframe %}
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
-<ul>
-  {% for show in shows %}
-      <li>{{ show[1] }} - {{ show[2] }}</li>
-  {% endfor %}
-</ul>
-            <div style="flex: 1; display: flex; justify-content: flex-end; margin-right: 5px;">
-                {{ iframe|safe }}
-            </div>
-           
-          
+<div class= "bg-1" style="display: flex;">
+<div class= "bg-2" id="list" style="height: 650px; flex: 1; overflow-y: auto;">
+  <ul class="list-group">
+    {% for show in shows|sort(attribute='2', reverse=True) %}
+      <li class="list-group-item show-item">
+        <div class="show-info">
+          <!--!img src="{{ url_for('static', filename='cc_resize.jpg') }}" alt="band" class="show-image"-->
+          <div class="show-details">
+            <h4>{{ show[1] }}</h4>
+            <p>Date: {{ show[2] }}</p>
+        </div>
+      </div>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+<div id="map" style="height: 500px;"></div>
+<div style="flex: 1; display: flex; justify-content: flex-end; margin-right: 5px;">
+  {{ iframe|safe }}
+</div>
 
 {% endblock iframe %}
 
