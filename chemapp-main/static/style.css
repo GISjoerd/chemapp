@@ -8,56 +8,125 @@
     -webkit-filter: grayscale(0%);
     filter: grayscale(0%); /* make all photos black and white */
     width: 100%; /* Set width to 100% */
+    
   }
 
   .item {
     height: 800px;
+    background: #000000;
   }
 
   .navbar {
-    min-height: 100px;
+    min-height: 110px;
+    background: #000000;
+    border: none;
   }
 
   .navbar-brand {
-    padding: 0 15px;
-    height: 100px;
-    line-height: 100px;
+    padding: 15px;
+    height: 110px;
+    line-height: 90px;
+    background: #000000;
+    border: none;
   }
 
   .navbar-toggle {
-    /* (100px - button height 34px) / 2 = 33px */
-    margin-top: 33px;
+    /* (110px - button height 34px) / 2 = 38px */
+    margin-top: 38px;
     padding: 9px 10px !important;
+    border: none;
   }
 
   @media (min-width: 768px) {
     .navbar-nav > li > a {
-      /* (100px - line-height of 27px) / 2 = 35.5px */
-      padding-top: 35.5px;
-      padding-bottom: 35.5px;
+      /* (110px - line-height of 27px) / 2 = 41.5px */
+      padding-top: 41.5px;
+      padding-bottom: 41.5px;
       line-height: 27px;
+      border: none;
     }
   }
 
+  .bg-1 {
+  padding-top: 110px;
+  background: #000000;
+  color: #000000;
+  height: 1000px;
+  }
 
-.bg-1 {
+  .bg-2 {
+  background: #fff;
+  }
+
+  .bg-1 h3 {color: #fff;}
+  .bg-1 h4 {color: #fff;}
+  .bg-1 p {
+    font-style: italic;
+    color: #fff;
+  }
+
+  .row {
   padding-top: 100px;
   background: #000000;
-  color: #ffffff;
+  color: #000000;
   height: 1000px;
-  
-}
+  }
 
-.bg-1 h3 {color: #fff;}
-.bg-1 p {font-style: italic;}
+  .list-container {
+  margin-top: 20px;
+  }
 
-.row {
-  padding-top: 100px;
-  background: #000000;
-  color: #ffffff;
-  height: 1000px;
+  .list-group {
+  padding: 10;
+  margin: 10;
+  background-color: #e9e9e9;
+  }
 
-}
+  .list-group-item {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    margin-bottom: -1px;
+    background-color: #000000;
+    border: 1px solid #ddd;
+  }
+
+  .list-item {
+  background-color: #000000;
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 5px;
+  }
+
+  .list-item:hover {
+  background-color: #5d5e5e;
+  cursor: pointer;
+  }
+
+  .list-item a {
+  text-decoration: none;
+  color: #000000;
+  }
+
+  .list-item a:hover {
+  text-decoration: underline;
+  }
 
 
-  </style>
+  /* this is the old list*/
+  /* Add this rule to your CSS file or within a style tag in the HTML */
+  #location-list {
+  margin: 10px; /* Adjust margins as needed */
+  }
+
+  #locations {
+  list-style-type: none;
+  padding: 0;
+  }
+
+  #locations li {
+  margin-bottom: 5px; /* Adjust margins as needed */
+  }
+
+
+</style>
