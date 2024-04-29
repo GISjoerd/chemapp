@@ -2,13 +2,21 @@
 
   .container {
   padding-top: 250px;
+  width: 100vw; 
   }
 
   .carousel-inner img {
-    -webkit-filter: grayscale(0%);
-    filter: grayscale(0%); /* make all photos black and white */
-    width: 100%; /* Set width to 100% */
+      padding-top: 110px;
+        max-width: 100%; /* Set width to 100% */
     
+  }
+
+  /* Define styles for cluster marker text */
+  .marker-cluster div {
+    color: #fff; /* Text color */
+    font-size: 14px; /* Text size */
+    text-align: center; /* Text alignment */
+    line-height: 40px; /* Line height to center the text vertically */
   }
 
   .item {
@@ -20,6 +28,11 @@
     min-height: 110px;
     background: #000000;
     border: none;
+  }
+
+  .wrapper { 
+    max-width: 960px;
+    margin-inline: auto;
   }
 
   .navbar-brand {
