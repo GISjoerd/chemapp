@@ -1,12 +1,15 @@
 {% extends "base.html" %}
-  {% block home_bp %}
-    <!-- homepagepicture -->
-    <div class="carousel-inner">
-      <div class="item active">
-        <img src="{{ url_for('static', filename='cc.jpg') }}" alt="cc">
-      </div>
+{% block home_bp %}
+  <!-- homepagepicture -->
+  <div class="carousel-inner">
+    <div class="item active">
+      <img id="carousel-image" src="{{ url_for('static', filename='SAN_1149_sRGB_Bewerkt.jpg') }}" alt="SAN_1149"> 
     </div>
-    {% endblock home_bp %}
+  </div>
+{% endblock home_bp %}
+
+
+
 
 
 

@@ -4,4 +4,4 @@ music_bp = Blueprint('music_bp', __name__, template_folder = "templates", static
 
 @music_bp.route("/music_bp")
 def music():
-    return render_template("music_bp.html")
+    return render_template("music_bp.html", active_page='music')
