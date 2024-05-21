@@ -4,4 +4,4 @@ mail_bp = Blueprint('mail_bp', __name__, template_folder = "templates", static_f
 
 @mail_bp.route("/mail_bp")
 def mail():
-    return render_template("mail_bp.html")
+    return render_template("mail_bp.html", active_page='mail')

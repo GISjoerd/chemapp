@@ -34,5 +34,5 @@ def map():
 
       #  html+= javascript_openpage_function
     print(shows)
-    return render_template("map_bp.html", shows=shows)
+    return render_template("map_bp.html", shows=shows, active_page='map')
  

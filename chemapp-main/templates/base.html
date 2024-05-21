@@ -4,43 +4,61 @@
   <title>Chemical Clouds</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> 
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-  crossorigin=""></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin="" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.3.0/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.3.0/dist/MarkerCluster.Default.css" />
 
   <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.3.0/dist/leaflet.markercluster.js"></script>
-  
-  
+  <script>
+    const imageUrls = {
+      small: "{{ url_for('static', filename='SAN_1357_sRGB_bewerkt.jpg') }}",
+      large: "{{ url_for('static', filename='SAN_1149_sRGB_Bewerkt.jpg') }}"
+    };
+  </script>
+  <script src="{{ url_for('static', filename='javascript.js') }}"></script>
+
 </head>
 
-<body id="chemical clouds" data-spy="scroll" data-target=".navbar" data-offset="50">
+<body>
 
 <!--Nav bar-->
-<nav class="navbar navbar-default navbar-fixed-top">
-    <div class="wrapper">
-      <div class="navbar-header">
-        <a class="navbar-brand" href="{{ url_for('home_bp.home') }}">Chemical Clouds</a>
-      </div>
-      <ul class="nav navbar-nav">
-        <li><a class="" href="{{ url_for('map_bp.map') }}">Tour Dates</a></li>
-        <li><a class="" href="{{ url_for('music_bp.music') }}">Music</a></li>
-        <li><a class="" href="{{ url_for('about_bp.about') }}">About</a></li>
-        <li><a class=""href="{{ url_for('mail_bp.mail') }}">Contact</a></li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="https://forms.gle/gKHdzgDXwGsHkEEH9"><span class="glyphicon glyphicon-user"></span> Become Chemical</a></li>
-        <li><a href="#"><span class="glyphicon glyphicon-shopping-cart"></span> Cart</a></li>
-      </ul>
-    </div> 
+<header class="header">
+<div class="header__content">
+  <a href="{{ url_for('home_bp.home') }}" class="logo">Chemical Clouds</a>
+  <nav class="nav">
+    <ul class="nav__list">
+      <li class="nav__item">
+        <a href="{{ url_for('map_bp.map') }}" class="nav__link {% if active_page == 'map' %}active{% endif %}">Tour Dates</a>
+        </li>
+      <li class="nav__item">
+        <a href="{{ url_for('music_bp.music') }}" class="nav__link {% if active_page == 'music' %}active{% endif %}">Music</a>
+        </li>
+      <li class="nav__item">
+        <a href="{{ url_for('about_bp.about') }}" class="nav__link {% if active_page == 'about' %}active{% endif %}">About</a>
+        </li>
+      <li class="nav__item">
+        <a href="{{ url_for('mail_bp.mail') }}" class="nav__link {% if active_page == 'mail' %}active{% endif %}">Contact</a>
+        </li>
+      <li class="nav_item2">
+        <a href="https://mailchi.mp/bec19833a031/chemical-community" class="nav__link2"> <ion-icon name="person-circle-outline" class="member-icon"></ion-icon> Become Chemical</a>
+      </li>
+      <!-- <li class="nav_item2">
+        <a href="#"class="nav__link2">Shop</a>
+      </li>  -->
+    </ul>
   </nav>
-
+  <div class ="hamburger">
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+  </div>
+</div>
+</header>
 {% block home_bp %}
 
 {% endblock home_bp %}
@@ -76,7 +94,8 @@
 
 {% block email %}
 {% endblock email %}
-  
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </body>
 </html>
 
