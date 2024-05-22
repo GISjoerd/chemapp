@@ -7,11 +7,13 @@ from info.view import info_bp
 from music.view import music_bp
 from mail.view import mail_bp
 from database.view import database_bp
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
- 
-
-app = Flask(__name__)   
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Spalstraat%4025@localhost/CC_shows'
+app = Flask(__name__)
+db_uri = os.environ.get('DATABASE_KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 db = SQLAlchemy(app)
 
 def create_tables():
