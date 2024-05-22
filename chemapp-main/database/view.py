@@ -4,15 +4,23 @@ from flask_sqlalchemy import SQLAlchemy
 from geoalchemy2 import Geometry
 import psycopg2
 import json
+from dotenv import load_dotenv
+import os
 
+# Load environment variables from .env file
+load_dotenv(override=True)
 
 db = SQLAlchemy()
 database_bp = Blueprint('database_bp', __name__, template_folder="templates", static_folder="static", url_prefix="/database")
    
-def get_db_connection():    
-    conn = psycopg2.connect(host='localhost', database='CC_shows', user='postgres', password='Spalstraat@25')
+def get_db_connection():
+    conn = psycopg2.connect(
+        host=os.getenv('DATABASE_HOST'),
+        database=os.getenv('DATABASE'),
+        user=os.getenv('DATABASE_USER'),
+        password=os.getenv('DATABASE_PASSWORD')
+    )
     return conn
-
 class Show(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
