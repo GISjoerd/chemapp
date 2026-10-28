@@ -1,0 +1,2 @@
+# Only public/ may be a document root. Keep config, SQL, imports and code private.
+Require all denied
