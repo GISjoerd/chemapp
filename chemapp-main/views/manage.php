@@ -54,6 +54,18 @@
         </ul>
       </aside>
       <div class="manager-card">
+        <?php if ($deleteConfirmation): ?>
+        <h2>Delete this show?</h2>
+        <p><strong><?= e($form['name']) ?></strong> · <time datetime="<?= e($form['date']) ?>"><?= e(date('d M Y', strtotime($form['date']))) ?></time></p>
+        <p>This permanently removes the show from Tour Dates and the map. This cannot be undone.</p>
+        <form method="post" action="<?= e(page_url('manage')) ?>" id="delete-show-form">
+          <input type="hidden" name="csrf" value="<?= e($_SESSION['csrf'] ?? '') ?>">
+          <input type="hidden" name="action" value="delete">
+          <input type="hidden" name="id" value="<?= e($form['id']) ?>">
+          <label class="manager-delete-confirm"><input type="checkbox" name="confirm_delete" value="<?= e($form['id']) ?>" required> I want to permanently delete this show.</label>
+          <div class="manager-save"><button type="submit" class="manager-button danger">Delete show permanently</button><a href="<?= e(page_url('manage', ['id' => $form['id']])) ?>">Cancel</a></div>
+        </form>
+        <?php else: ?>
         <h2><?= $form['id'] === '' ? 'Add a show' : 'Edit show' ?></h2>
         <form method="post" action="<?= e(page_url('manage')) ?>" id="show-form">
           <input type="hidden" name="csrf" value="<?= e($_SESSION['csrf'] ?? '') ?>">
@@ -78,6 +90,10 @@
           <button type="button" id="clear-location" class="manager-button secondary">Clear location</button>
           <div class="manager-save"><button type="submit" name="action" value="save" class="manager-button"><?= $form['id'] === '' ? 'Add show' : 'Save changes' ?></button><a href="<?= e(page_url('map')) ?>">Back to Tour Dates</a></div>
         </form>
+        <?php if ($form['id'] !== ''): ?>
+          <div class="manager-delete"><a class="manager-button danger" href="<?= e(page_url('manage', ['id' => $form['id'], 'delete' => 1])) ?>">Delete show…</a></div>
+        <?php endif; ?>
+        <?php endif; ?>
       </div>
     </div>
     <script src="<?= e(asset('admin-map.js')) ?>" defer></script>

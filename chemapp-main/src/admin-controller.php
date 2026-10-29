@@ -16,6 +16,7 @@ $success = '';
 $authenticated = false;
 $setup = false;
 $setupAllowed = false;
+$deleteConfirmation = false;
 $shows = [];
 $form = ['id' => '', 'name' => '', 'date' => '', 'latitude' => '', 'longitude' => '', 'link_ticket' => '', 'link_img' => ''];
 try {
@@ -47,6 +48,23 @@ try {
             $_SESSION = [];
             session_regenerate_id(true);
             admin_redirect();
+        } elseif ($action === 'delete' && $authenticated) {
+            $id = is_string($_POST['id'] ?? null)
+                ? filter_var($_POST['id'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 4294967295]])
+                : false;
+            if ($id === false) {
+                throw new InvalidArgumentException('Invalid show ID.');
+            }
+            if (($_POST['confirm_delete'] ?? null) !== (string) $id) {
+                throw new InvalidArgumentException('Select the show and confirm its deletion before removing it.');
+            }
+            if (!delete_show(database(), $id)) {
+                http_response_code(404);
+                $error = 'This show no longer exists.';
+            } else {
+                $_SESSION['notice'] = 'Show deleted.';
+                admin_redirect();
+            }
         } elseif ($action === 'save' && $authenticated) {
             foreach ($form as $key => $value) {
                 $form[$key] = is_string($_POST[$key] ?? null) ? $_POST[$key] : '';
@@ -86,6 +104,7 @@ try {
                 $error = 'This show could not be found.';
             } else {
                 $form = array_intersect_key($selected, $form);
+                $deleteConfirmation = ($_GET['delete'] ?? null) === '1';
             }
         }
         $success = $_SESSION['notice'] ?? '';
@@ -109,6 +128,6 @@ try {
 } catch (Throwable $exception) {
     error_log('Chemapp admin error: ' . $exception->getMessage());
     http_response_code(503);
-    $error = 'The show manager is unavailable. Check the MySQL connection, SELECT/INSERT/UPDATE permissions, and that PHP can write the private storage folder. Details are in the PHP terminal or error log.';
+    $error = 'The show manager is unavailable. Check the MySQL connection, SELECT/INSERT/UPDATE/DELETE permissions, and that PHP can write the private storage folder. Details are in the PHP terminal or error log.';
 }
 require $appRoot . '/views/layout.php';

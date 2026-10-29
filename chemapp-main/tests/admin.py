@@ -140,6 +140,32 @@ with tempfile.TemporaryDirectory() as directory:
         assert [r for r in public if r['id'] != show_id] == original
         request(client, base, fields=updated | {'id': '4294967295'}, expected=404)
         request(client, base, '/index.php?page=manage&id[]=1', expected=404)
+        deletion = {'action': 'delete', 'csrf': token, 'id': str(show_id), 'confirm_delete': str(show_id)}
+        request(guest, base, fields=deletion | {'csrf': guest_token}, expected=403)
+        request(client, base, fields=deletion | {'csrf': 'wrong'}, expected=403)
+        request(client, base, fields=deletion | {'confirm_delete': ''}, expected=400)
+        request(client, base, fields=deletion | {'confirm_delete': str(show_id + 1)}, expected=400)
+        for invalid_id in ['', '0', '-1', '1 OR 1=1', '999999999999']:
+            request(client, base, fields=deletion | {'id': invalid_id}, expected=400)
+        request(client, base, fields=deletion | {'id[]': '1'}, expected=400)
+        before_delete = json.loads(request(client, base, '/index.php?page=api%2Fshows')[0])
+        assert before_delete == public
+        # Opening a confirmation page, a forged GET action, or Cancel never deletes data.
+        confirm_path = edit_path + '&delete=1'
+        html, _ = request(client, base, confirm_path)
+        assert 'Delete this show?' in html and 'Changed tour date' in html and '2029-06-18' in html
+        assert 'name="confirm_delete"' in html and 'Cancel' in html
+        request(client, base, edit_path + '&action=delete&confirm_delete=' + str(show_id))
+        html, _ = request(client, base, edit_path)
+        assert 'Delete show…' in html
+        assert json.loads(request(client, base, '/index.php?page=api%2Fshows')[0]) == public
+        _, headers = request(client, base, fields=deletion, expected=303)
+        assert headers['Location'] == '/index.php?page=manage'
+        html, _ = request(client, base)
+        assert 'Show deleted.' in html
+        assert json.loads(request(client, base, '/index.php?page=api%2Fshows')[0]) == original
+        request(client, base, '/index.php?page=info&id=' + str(show_id), expected=404)
+        request(client, base, fields=deletion, expected=404)
         request(client, base, fields={'csrf': token, 'action': 'logout'}, expected=303)
         html, _ = request(client, base)
         assert 'name="password"' in html and 'show-form' not in html
@@ -177,4 +203,4 @@ with tempfile.TemporaryDirectory() as directory:
         html, _ = request(client, base, expected=503)
         assert 'show manager is unavailable' in html and 'PDOException' not in html
 
-print('Admin setup, login, logout, CSRF, authorization, validation, MySQL add/edit, escaping, password reset, throttling and subfolder tests passed.')
+print('Admin setup, login, logout, CSRF, authorization, validation, MySQL add/edit/delete, confirmation/cancel, escaping, password reset, throttling and subfolder tests passed.')

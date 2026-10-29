@@ -31,5 +31,9 @@
 .show-manager .leaflet-control-attribution a { color: #1477ac; }
 .manager-coordinates { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
 .manager-save { margin-top: 28px; justify-content: flex-start; }
+.manager-button.danger { color: #ffd0d0 !important; background: #52242c; border-color: #ed8a8a; }
+.manager-delete { margin-top: 28px; padding-top: 24px; border-top: 1px solid #3d444c; }
+.show-manager .manager-delete-confirm { display: flex; gap: 10px; align-items: flex-start; }
+.show-manager .manager-delete-confirm input { width: auto; margin-top: 3px; }
 .tour-tools { padding: 10px 20px; text-align: right; color: #e8f45c; background: #13161a; }
 @media (max-width: 767px) { .manager-grid { grid-template-columns: 1fr; } .manager-shows { order: 2; } .manager-card { padding: 18px; } .manager-coordinates { grid-template-columns: 1fr; gap: 0; } }

@@ -116,7 +116,7 @@ A private `config.php` is simplest for shared hosting. Environment variables ove
 | URL prefix, e.g. `/band` | `CHEMAPP_BASE_PATH` |
 | Alternate private config file | `CHEMAPP_CONFIG` |
 
-Remote database TLS uses the configured CA and certificate verification. `CHEMAPP_CONFIG` must point to a trusted private PHP file. Use a database user restricted to the application's database. The public website needs SELECT; adding shows needs INSERT, and the show manager also needs UPDATE. Schema installation requires CREATE separately. Remove the Python deployment and old PostgreSQL environment variables when you switch to this version.
+Remote database TLS uses the configured CA and certificate verification. `CHEMAPP_CONFIG` must point to a trusted private PHP file. Use a database user restricted to the application's database. The public website needs SELECT; adding shows needs INSERT, editing needs UPDATE, and deleting needs DELETE. Schema installation requires CREATE separately. Remove the Python deployment and old PostgreSQL environment variables when you switch to this version.
 
 ## Shows API
 
@@ -136,9 +136,9 @@ Example JSON body, with `Content-Type: application/json`:
 }
 ```
 
-GeoJSON coordinates are **longitude, latitude**, matching the old API. Alternatively send `latitude` and `longitude` directly; omit both for a show without a map location. Links may be empty or valid HTTP(S) URLs. POST returns HTTP 201 and the new ID; validation/authentication/method errors return JSON with an appropriate status. The password-protected show manager below adds and edits shows in your browser. The public API still only supports reading and token-protected creation.
+GeoJSON coordinates are **longitude, latitude**, matching the old API. Alternatively send `latitude` and `longitude` directly; omit both for a show without a map location. Links may be empty or valid HTTP(S) URLs. POST returns HTTP 201 and the new ID; validation/authentication/method errors return JSON with an appropriate status. The password-protected show manager below adds, edits and deletes shows in your browser. The public API still only supports reading and token-protected creation.
 
-## Add and edit tour dates in your browser
+## Add, edit and delete tour dates in your browser
 
 Open **Tour Dates → Manage shows**, or visit `http://127.0.0.1:8000/index.php?page=manage` locally. The manager uses your existing `config.php` and `shows` table; there is no schema migration and your existing dates stay in place.
 
@@ -149,10 +149,10 @@ Open **Tour Dates → Manage shows**, or visit `http://127.0.0.1:8000/index.php?
 3. Once, sign into MySQL as root in a separate terminal and give the existing website account permission to edit shows:
 
    ```sql
-   GRANT SELECT, INSERT, UPDATE ON chemapp.* TO 'chemapp_local'@'127.0.0.1';
+   GRANT SELECT, INSERT, UPDATE, DELETE ON chemapp.* TO 'chemapp_local'@'127.0.0.1';
    ```
 
-   Use your actual database/account names if they differ. This changes permissions only; it does not reset the password or change show data. The manager does not need DELETE permission.
+   Use your actual database/account names if they differ. This changes permissions only; it does not reset the password or change show data. DELETE is needed only for removing shows.
 4. In VS Code, open a PowerShell terminal in the application directory and start PHP using your installed location:
 
    ```powershell
@@ -163,7 +163,7 @@ Open **Tour Dates → Manage shows**, or visit `http://127.0.0.1:8000/index.php?
 6. Fill the name and date, optional ticket/poster links, and click the map to select a location. You can drag the marker, enter coordinates directly, or leave both coordinates empty. Click **Add show**. Changes appear immediately on Tour Dates.
 7. Select an existing show in **Your shows**, change its fields, and click **Save changes**. Click **+ Add show** for another date. Use **Log out** when finished.
 
-Poster links must point to an image accessible over HTTP(S); this form does not upload files. Map tiles require internet access, but the form and coordinate fields work if the map cannot load. There is no delete action.
+Poster links must point to an image accessible over HTTP(S); this form does not upload files. Map tiles require internet access, but the form and coordinate fields work if the map cannot load. To remove a show, select it in **Your shows**, click **Delete show…**, check the confirmation box, and click **Delete show permanently**. The confirmation page displays the show name and date. **Cancel** returns to editing without changing anything. Deletion is permanent and removes the show from both the list and map. If you installed the earlier manager, grant DELETE once as MySQL root: `GRANT DELETE ON chemapp.* TO 'chemapp_local'@'127.0.0.1';`.
 
 ### Admin password storage and hosting
 
@@ -177,7 +177,7 @@ php bin/set-admin-password.php
 
 It prompts twice for a password and can also reset a forgotten password. Input is visible, so use a private terminal. Resetting it invalidates existing manager sessions. Do not delete the credential file as a reset method on a public site. Use HTTPS when logging in online. If TLS terminates at a proxy, configure the web server so PHP correctly receives `HTTPS=on` for secure cookies; the application does not trust arbitrary forwarded headers.
 
-Sessions use HttpOnly, SameSite=Strict cookies and expire after 30 minutes of inactivity or eight hours total. Forms require a session CSRF token; only logged-in sessions can save shows. Login allows ten failed attempts per five-minute window across the installation, then responds with a temporary lockout. API write tokens and admin passwords are independent.
+Sessions use HttpOnly, SameSite=Strict cookies and expire after 30 minutes of inactivity or eight hours total. Forms require a session CSRF token; only logged-in sessions can save or delete shows. Deletion requires a POST with explicit confirmation; opening a link never deletes a show. Login allows ten failed attempts per five-minute window across the installation, then responds with a temporary lockout. API write tokens and admin passwords are independent.
 
 ## Local development and checks
 
@@ -196,6 +196,6 @@ node --check public/static/map.js
 node --check public/static/admin-map.js
 ```
 
-For a disposable MySQL database, set the database environment variables and run `CHEMAPP_TEST_DATABASE=1 php tests/database.php`. This test refuses a nonempty `shows` table, inserts inside a transaction and rolls back. The GitHub Actions workflow runs lint, validation, MySQL integration, CLI import/conversion, HTTP smoke tests and admin login/add/edit tests on PHP 8.2 and 8.3. No real credentials or production database are used.
+For a disposable MySQL database, set the database environment variables and run `CHEMAPP_TEST_DATABASE=1 php tests/database.php`. This test refuses a nonempty `shows` table, inserts inside a transaction and rolls back. The GitHub Actions workflow runs lint, validation, MySQL integration, CLI import/conversion, HTTP smoke tests and admin login/add/edit/delete tests on PHP 8.2 and 8.3. No real credentials or production database are used.
 
 The original Python implementation remains available in Git history. This conversion does not deploy anything to your live server or migrate its real database automatically.
