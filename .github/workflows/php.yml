@@ -1,0 +1,62 @@
+name: PHP and MySQL checks
+on:
+  push:
+    branches: [main, php-mysql-migration]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        php: ['8.2', '8.3']
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: disposable-root-password
+          MYSQL_DATABASE: chemapp_test
+          MYSQL_USER: chemapp_test
+          MYSQL_PASSWORD: disposable-test-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    env:
+      CHEMAPP_DB_HOST: 127.0.0.1
+      CHEMAPP_DB_PORT: '3306'
+      CHEMAPP_DB_NAME: chemapp_test
+      CHEMAPP_DB_USER: chemapp_test
+      CHEMAPP_DB_PASSWORD: disposable-test-password
+      CHEMAPP_TEST_DATABASE: '1'
+    defaults:
+      run:
+        working-directory: chemapp-main
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pdo_mysql
+          coverage: none
+      - name: PHP and JavaScript syntax
+        run: |
+          find . -name '*.php' -print0 | xargs -0 -n1 php -l
+          node --check public/static/javascript.js
+          node --check public/static/map.js
+          node --check public/static/admin-map.js
+      - name: Validate inputs and CSV
+        run: php tests/validation.php
+      - name: Create disposable schema and test MySQL
+        run: |
+          php -r 'require "src/bootstrap.php"; database()->exec(file_get_contents("database/schema.sql"));'
+          php tests/database.php
+      - name: Test HTTP routes and migration tools
+        run: |
+          python3 tests/smoke.py
+          python3 tests/admin.py

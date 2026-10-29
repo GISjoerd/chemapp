@@ -1,0 +1,11 @@
+config.php
+.env
+.env.*
+!.env.example
+*.csv
+*.sql.gz
+__pycache__/
+*.pyc
+
+*.mysql.sql
+chemapp-main/storage/

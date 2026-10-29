@@ -1,0 +1,39 @@
+<div id="contact" class="bg-1">
+  <div class="container-fluid text-center">
+    <div class="icon-container">
+      <div class="icon-item">
+        <a href="mailto:info@chemicalclouds.nl" class="icon-link">
+          <ion-icon name="mail-outline" class="contact-icon"></ion-icon>
+        </a>
+        <p>info@chemicalclouds.nl</p>
+     
+      </div>
+      <div class="icon-item">
+        <a href="https://www.instagram.com/chemical_clouds/" class="icon-link">
+          <ion-icon name="logo-instagram" class="contact-icon"></ion-icon>
+        </a>
+        <p>Instagram</p>
+      </div>
+      <div class="icon-item">
+        <a href="https://www.facebook.com/chemical_clouds/" class="icon-link">
+          <ion-icon name="logo-facebook" class="contact-icon"></ion-icon>
+        </a>
+        <p>Facebook</p>
+      </div>
+      <div class="icon-item">
+        <a href="tel:+31657369950" class="icon-link">
+            <ion-icon name="call-outline" class="contact-icon"></ion-icon>
+        </a>
+        <p>06-57369950</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="credits-container">
+    <p>Photo's - @Sanne Wevers</p>
+    <p>Artwork - @Babs Wolbert</p>
+    <p>Webdesign - @Sjoerd Wolbert</p>
+  </div>
+
