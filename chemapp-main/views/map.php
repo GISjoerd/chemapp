@@ -1,3 +1,4 @@
+<div class="tour-tools"><a href="<?= e(page_url('manage')) ?>">Manage shows</a></div>
 <?php if ($databaseError): ?>
   <p class="page-message" role="alert">Tour dates are temporarily unavailable. Please try again later.</p>
 <?php endif; ?>

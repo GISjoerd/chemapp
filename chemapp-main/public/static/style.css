@@ -576,3 +576,4 @@ body {
 .page-message { color: #eee; padding: 2rem; }
 .show-detail { max-width: 800px; margin: 2rem auto; color: #eee; padding: 1rem; }
 .show-detail img { max-width: 100%; height: auto; }
+.tour-tools { padding: 10px 20px; text-align: right; color: #e8f45c; background: #13161a; }

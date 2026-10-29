@@ -18,6 +18,11 @@ $page = $_GET['page'] ?? $legacy[$path] ?? ($path === '/index.php' ? 'home' : '4
 $page = is_string($page) ? $page : '404';
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
+if ($page === 'manage') {
+    require $appRoot . '/src/admin-controller.php';
+    exit;
+}
+
 if ($page === 'api/shows') {
     header('Cache-Control: no-store');
     if (!in_array($method, ['GET', 'POST'], true)) {
