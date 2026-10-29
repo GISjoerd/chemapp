@@ -25,7 +25,7 @@
       <?php endforeach; ?>
     </ul>
   </div>
-  <div id="map" class="map_box" aria-label="Tour locations"></div>
+  <div id="map" class="map_box" data-marker-icon="<?= e(asset('guitar-pick-marker.png')) ?>" aria-label="Tour locations"></div>
 </div>
 <script type="application/json" id="shows-data"><?= json_encode($shows, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR) ?></script>
 <script src="<?= e(asset('map.js')) ?>" defer></script>

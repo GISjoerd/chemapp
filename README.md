@@ -185,6 +185,8 @@ Tour Dates opens with **Upcoming shows**, ordered nearest date first. Select **P
 
 This display change needs no database migration or additional permissions. The private manager continues to list all shows for adding, editing and deleting.
 
+Individual tour locations use the band's teal skull logo inside a guitar pick, with a thin pale yellow outline and transparent background (`chemapp-main/public/static/guitar-pick-marker.png`). The pick's tip points at the venue coordinate. Clicking a pick still opens the show popup; nearby locations still cluster as before. The icon applies to upcoming and past shows. This is a public map asset, separate from each show's optional poster link.
+
 ## Local development and checks
 
 ```sh

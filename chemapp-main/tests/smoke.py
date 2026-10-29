@@ -114,6 +114,10 @@ with Server(env) as base:
     assert data[0]['geometry']['coordinates'] == [6.42, 52.02] and data[0]['date'] == today.isoformat()
     html = request(base, '/index.php?page=map')
     assert dangerous_name not in html and '&lt;/script&gt;' in html
+    assert 'data-marker-icon="/static/guitar-pick-marker.png"' in html
+    with urlopen(base + '/static/guitar-pick-marker.png', timeout=5) as response:
+        assert response.status == 200 and response.headers.get_content_type() == 'image/png'
+        assert response.read(8) == b'\x89PNG\r\n\x1a\n'
     embedded = re.search(r'<script type="application/json" id="shows-data">(.*?)</script>', html, re.S).group(1)
     assert json.loads(embedded)[0]['name'] == dangerous_name and '<script>' not in embedded
     fixtures = []
@@ -153,6 +157,9 @@ with tempfile.TemporaryDirectory() as tmp:
         assert 'static\\' not in html
         request(base, '/band/static/style.css')
         html = request(base, '/band/index.php?page=map&period=past')
+        assert 'data-marker-icon="/band/static/guitar-pick-marker.png"' in html
+        with urlopen(base + '/band/static/guitar-pick-marker.png', timeout=5) as response:
+            assert response.status == 200 and response.read(8) == b'\x89PNG\r\n\x1a\n'
         assert '/band/index.php?page=map&amp;period=upcoming' in html
         assert '/band/index.php?page=map&amp;period=past" aria-current="page"' in html
         assert map_shows(html) == []
