@@ -179,6 +179,12 @@ It prompts twice for a password and can also reset a forgotten password. Input i
 
 Sessions use HttpOnly, SameSite=Strict cookies and expire after 30 minutes of inactivity or eight hours total. Forms require a session CSRF token; only logged-in sessions can save or delete shows. Deletion requires a POST with explicit confirmation; opening a link never deletes a show. Login allows ten failed attempts per five-minute window across the installation, then responds with a temporary lockout. API write tokens and admin passwords are independent.
 
+## Upcoming and past tour dates
+
+Tour Dates opens with **Upcoming shows**, ordered nearest date first. Select **Past shows** to see previous dates, newest first. The map displays only locations in the selected group. Shows without coordinates remain in the list. Today's shows count as upcoming, using the Europe/Amsterdam calendar date; shows move to the past group automatically the next day. Each group has its own empty-state message. The buttons work without JavaScript and can be bookmarked or shared.
+
+This display change needs no database migration or additional permissions. The private manager continues to list all shows for adding, editing and deleting.
+
 ## Local development and checks
 
 ```sh

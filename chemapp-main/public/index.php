@@ -80,12 +80,19 @@ $message = 'This page could not be found.';
 $shows = [];
 $show = null;
 $databaseError = false;
+$tourPeriod = ($_GET['period'] ?? null) === 'past' ? 'past' : 'upcoming';
+$tourToday = (new DateTimeImmutable('today', new DateTimeZone('Europe/Amsterdam')))->format('Y-m-d');
 if ($view === 'message') {
     http_response_code(404);
 }
 try {
     if ($page === 'map') {
-        $shows = all_shows(database());
+        $shows = array_values(array_filter(all_shows(database()), fn (array $entry): bool =>
+            $tourPeriod === 'past' ? $entry['date'] < $tourToday : $entry['date'] >= $tourToday
+        ));
+        if ($tourPeriod === 'upcoming') {
+            $shows = array_reverse($shows);
+        }
     } elseif ($page === 'info' && isset($_GET['id'])) {
         $id = filter_var($_GET['id'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 4294967295]]);
         $show = $id === false ? null : find_show(database(), $id);
