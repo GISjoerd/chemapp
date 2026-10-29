@@ -22,10 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const markerById = new Map();
     const showIcon = L.icon({
         iconUrl: container.dataset.markerIcon,
-        iconSize: [48, 56],
+        iconSize: [36, 42],
         // Anchor the visible pick tip; the image has a small transparent margin.
-        iconAnchor: [24, 53],
-        popupAnchor: [0, -50]
+        iconAnchor: [18, 40],
+        popupAnchor: [0, -38]
     });
     const shows = JSON.parse(document.getElementById('shows-data').textContent);
     function safeUrl(value) {
