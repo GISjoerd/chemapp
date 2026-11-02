@@ -50,13 +50,18 @@ function admin_password_hash(): string
     return admin_state(fn (array $state): string => $state['password_hash'] ?? '');
 }
 
-function admin_set_password(string $password, bool $replace = false): string
+function admin_hash_password(string $password): string
 {
     // Bcrypt (PASSWORD_DEFAULT) accepts at most 72 bytes; reject silent truncation.
     if (strlen($password) < 12 || strlen($password) > 72 || str_contains($password, "\0")) {
         throw new InvalidArgumentException('Choose a password between 12 and 72 bytes long.');
     }
-    $hash = password_hash($password, PASSWORD_DEFAULT);
+    return password_hash($password, PASSWORD_DEFAULT);
+}
+
+function admin_set_password(string $password, bool $replace = false): string
+{
+    $hash = admin_hash_password($password);
     return admin_state(function (array &$state) use ($hash, $replace): string {
         if (!$replace && !empty($state['password_hash'])) {
             throw new InvalidArgumentException('An admin password has already been set. Please log in.');
@@ -72,6 +77,47 @@ function admin_local_setup_allowed(): bool
     $host = parse_url('http://' . ($_SERVER['HTTP_HOST'] ?? ''), PHP_URL_HOST);
     return in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true)
         && in_array(strtolower((string) $host), ['127.0.0.1', 'localhost', '[::1]'], true);
+}
+
+/** Public first-time setup needs HTTPS and a secret configured outside the web root. */
+function admin_online_setup_allowed(): bool
+{
+    $key = app_config()['admin_setup_key'];
+    return !empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off'
+        && is_string($key) && preg_match('/^[A-Za-z0-9_-]{32,128}$/D', $key) === 1;
+}
+
+function admin_check_attempt_limit(array &$state): void
+{
+    $now = time();
+    if ($now - ($state['window_start'] ?? 0) >= 300) {
+        $state['failures'] = 0;
+        $state['window_start'] = $now;
+    }
+    if (($state['failures'] ?? 0) >= 10) {
+        throw new OverflowException('Too many login or setup attempts. Wait five minutes and try again.');
+    }
+}
+
+/** Verify and consume setup authorization while holding the credential-file lock. */
+function admin_setup_online(string $password, mixed $key): string
+{
+    if (!admin_online_setup_allowed()) {
+        return '';
+    }
+    return admin_state(function (array &$state) use ($password, $key): string {
+        if (!empty($state['password_hash'])) {
+            throw new InvalidArgumentException('An admin password has already been set. Please log in.');
+        }
+        admin_check_attempt_limit($state);
+        if (!is_string($key) || !hash_equals(app_config()['admin_setup_key'], $key)) {
+            $state['failures'] = ($state['failures'] ?? 0) + 1;
+            return '';
+        }
+        $hash = admin_hash_password($password);
+        $state = ['password_hash' => $hash, 'failures' => 0, 'window_start' => time()];
+        return $hash;
+    });
 }
 
 function admin_session_start(): void
@@ -114,14 +160,7 @@ function admin_authenticated(string $hash): bool
 function admin_login(string $password): bool
 {
     return admin_state(function (array &$state) use ($password): bool {
-        $now = time();
-        if ($now - ($state['window_start'] ?? 0) >= 300) {
-            $state['failures'] = 0;
-            $state['window_start'] = $now;
-        }
-        if (($state['failures'] ?? 0) >= 10) {
-            throw new OverflowException('Too many login attempts. Wait five minutes and try again.');
-        }
+        admin_check_attempt_limit($state);
         $hash = $state['password_hash'] ?? '';
         $valid = $hash !== '' && strlen($password) <= 72 && password_verify($password, $hash);
         $state['failures'] = $valid ? 0 : ($state['failures'] ?? 0) + 1;

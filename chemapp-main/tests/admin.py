@@ -25,8 +25,11 @@ class NoRedirect(HTTPRedirectHandler):
         return None
 
 
-def browser():
-    jar = http.cookiejar.CookieJar()
+def browser(simulated_https=False):
+    # The HTTPS fixture below simulates trusted TLS termination at the web server.
+    # Permit Secure cookies over its loopback HTTP transport only in that fixture.
+    policy = http.cookiejar.DefaultCookiePolicy(secure_protocols=('https', 'http') if simulated_https else ('https', 'wss'))
+    jar = http.cookiejar.CookieJar(policy)
     return build_opener(HTTPCookieProcessor(jar), NoRedirect()), jar
 
 
@@ -51,7 +54,7 @@ def csrf(html):
 
 
 @contextlib.contextmanager
-def server(app, env, subfolder=False):
+def server(app, env, subfolder=False, trusted_https=False):
     with socket.socket() as sock:
         sock.bind(('127.0.0.1', 0))
         port = sock.getsockname()[1]
@@ -62,6 +65,10 @@ def server(app, env, subfolder=False):
         cmd = [PHP, '-S', f'127.0.0.1:{port}', '-t', str(root)]
     else:
         cmd = [PHP, '-S', f'127.0.0.1:{port}', '-t', str(app / 'public'), str(app / 'public/router.php')]
+    if trusted_https:
+        router = app / 'trusted-https-router.php'
+        router.write_text("<?php $_SERVER['HTTPS'] = 'on'; $_SERVER['SCRIPT_NAME'] = '/index.php'; require __DIR__ . '/public/index.php';")
+        cmd[-1] = str(router)
     sessions = app / 'sessions'
     sessions.mkdir(exist_ok=True)
     cmd[1:1] = ['-d', 'session.save_path=' + str(sessions)]
@@ -203,4 +210,90 @@ with tempfile.TemporaryDirectory() as directory:
         html, _ = request(client, base, expected=503)
         assert 'show manager is unavailable' in html and 'PDOException' not in html
 
-print('Admin setup, login, logout, CSRF, authorization, validation, MySQL add/edit/delete, confirmation/cancel, escaping, password reset, throttling and subfolder tests passed.')
+# Public first-time setup using the actual Plesk private-directory layout.
+with tempfile.TemporaryDirectory() as directory:
+    app = Path(directory) / 'app'
+    shutil.copytree(APP, app, ignore=shutil.ignore_patterns('storage', 'static', 'config.php', '__pycache__'))
+    (app / 'public/static').symlink_to(APP / 'public/static', target_is_directory=True)
+    private = app / 'chemapp-private'
+    private.mkdir()
+    for name in ['src', 'views', 'bin']:
+        shutil.move(str(app / name), private / name)
+    index = app / 'public/index.php'
+    index.write_text(index.read_text().replace('$appRoot = dirname(__DIR__);', "$appRoot = dirname(__DIR__) . '/chemapp-private';"))
+    config = private / 'config.php'
+    env = dict(os.environ, CHEMAPP_CONFIG=str(config), CHEMAPP_BASE_PATH='')
+    env.pop('CHEMAPP_ADMIN_SETUP_KEY', None)
+    setup_key = 'disposable-private-setup-key-' + 'a' * 36
+    password = 'online-disposable-admin-password'
+    public_headers = {'Host': 'public.example', 'X-Forwarded-Proto': 'https', 'X-Forwarded-For': '127.0.0.1'}
+    config.write_text("<?php return ['admin_setup_key' => '" + setup_key + "'];")
+    with server(app, env) as base:
+        client, _ = browser()
+        html, _ = request(client, base, headers=public_headers)
+        assert 'Admin setup required' in html and 'name="setup_key"' not in html
+        local_html, _ = request(client, base)
+        request(client, base, fields={'csrf': csrf(local_html), 'action': 'setup', 'setup_key': setup_key, 'password': password, 'password_confirm': password}, headers=public_headers, expected=403)
+    with server(app, env, trusted_https=True) as base:
+        client, cookies = browser(simulated_https=True)
+        guest, _ = browser(simulated_https=True)
+        for key in ['', 'too-short', 'bad key with spaces' + 'x' * 32, 'x' * 129]:
+            config.write_text("<?php return ['admin_setup_key' => '" + key + "'];")
+            html, _ = request(client, base, headers=public_headers)
+            assert 'Admin setup required' in html and 'name="password"' not in html
+        config.write_text("<?php return ['admin_setup_key' => '" + setup_key + "'];")
+        html, _ = request(client, base, headers=public_headers)
+        assert 'Choose your admin password' in html and 'name="setup_key"' in html
+        assert setup_key not in html
+        token = csrf(html)
+        setup = {'csrf': token, 'action': 'setup', 'setup_key': setup_key, 'password': password, 'password_confirm': password}
+        request(client, base, fields=setup | {'csrf': 'wrong'}, headers=public_headers, expected=403)
+        request(client, base, fields=setup | {'password_confirm': 'mismatch'}, headers=public_headers, expected=400)
+        request(client, base, fields=setup | {'password': 'short', 'password_confirm': 'short'}, headers=public_headers, expected=400)
+        for key in [None, '', 'incorrect', ['bad']]:
+            fields = setup | {'setup_key': key}
+            if key is None:
+                fields.pop('setup_key')
+            elif isinstance(key, list):
+                fields.pop('setup_key')
+                fields['setup_key[]'] = key
+            html, _ = request(client, base, fields=fields, headers=public_headers, expected=403)
+            assert setup_key not in html and password not in html
+        # Brute-force protection persists across requests and rejects even the right key at the limit.
+        for _ in range(6):
+            request(client, base, fields=setup | {'setup_key': 'wrong'}, headers=public_headers, expected=403)
+        request(client, base, fields=setup, headers=public_headers, expected=429)
+        state_path = private / 'storage/admin.json'
+        state = json.loads(state_path.read_text())
+        assert state.get('password_hash', '') == '' and state['failures'] == 10
+        state['window_start'] = 0  # Expire the fixture's five-minute lockout without sleeping.
+        state_path.write_text(json.dumps(state))
+        _, headers = request(client, base, fields=setup, headers=public_headers, expected=303)
+        assert headers['Location'] == '/index.php?page=manage'
+        state = json.loads(state_path.read_text())
+        assert password not in json.dumps(state) and setup_key not in json.dumps(state)
+        assert state['password_hash'].startswith('$2y$')
+        assert all(cookie.secure for cookie in cookies)
+        html, _ = request(client, base, headers=public_headers)
+        assert 'show-form' in html and 'name="setup_key"' not in html
+        assert 'Admin login created.' in html and 'Remove admin_setup_key' in html
+        token = csrf(html)
+        # The key cannot repeat setup or reset an existing password, even before removal.
+        guest_html, _ = request(guest, base, headers=public_headers)
+        assert 'Log in' in guest_html and 'name="setup_key"' not in guest_html
+        request(guest, base, fields=setup | {'csrf': csrf(guest_html)}, headers=public_headers, expected=403)
+        original = json.loads(request(client, base, '/index.php?page=api%2Fshows', headers=public_headers)[0])
+        show = {'action': 'save', 'csrf': token, 'id': '', 'name': 'Online setup show', 'date': '2030-05-17', 'latitude': '0', 'longitude': '0'}
+        request(guest, base, fields=show | {'csrf': csrf(guest_html)}, headers=public_headers, expected=403)
+        _, headers = request(client, base, fields=show, headers=public_headers, expected=303)
+        show_id = int(re.search(r'id=(\d+)', headers['Location']).group(1))
+        request(client, base, fields=show | {'id': str(show_id), 'name': 'Online edited show'}, headers=public_headers, expected=303)
+        request(client, base, fields={'csrf': token, 'action': 'delete', 'id': str(show_id), 'confirm_delete': str(show_id)}, headers=public_headers, expected=303)
+        assert json.loads(request(client, base, '/index.php?page=api%2Fshows', headers=public_headers)[0]) == original
+        config.write_text("<?php return ['admin_setup_key' => ''];")
+        request(client, base, fields={'csrf': token, 'action': 'logout'}, headers=public_headers, expected=303)
+        html, _ = request(client, base, headers=public_headers)
+        request(client, base, fields={'csrf': csrf(html), 'action': 'login', 'password': password}, headers=public_headers, expected=303)
+        assert 'show-form' in request(client, base, headers=public_headers)[0]
+
+print('Admin local/online setup, HTTPS and private-key gates, setup throttling, one-time setup, login, logout, CSRF, authorization, MySQL add/edit/delete, password reset and subfolder tests passed.')
