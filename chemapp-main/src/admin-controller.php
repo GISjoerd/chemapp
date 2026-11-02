@@ -16,6 +16,7 @@ $success = '';
 $authenticated = false;
 $setup = false;
 $setupAllowed = false;
+$localSetup = false;
 $deleteConfirmation = false;
 $shows = [];
 $form = ['id' => '', 'name' => '', 'date' => '', 'latitude' => '', 'longitude' => '', 'link_ticket' => '', 'link_img' => ''];
@@ -23,7 +24,8 @@ try {
     admin_session_start();
     $hash = admin_password_hash();
     $setup = $hash === '';
-    $setupAllowed = admin_local_setup_allowed();
+    $localSetup = admin_local_setup_allowed();
+    $setupAllowed = $localSetup || admin_online_setup_allowed();
     $authenticated = admin_authenticated($hash);
     if ($method === 'POST') {
         $action = $_POST['action'] ?? '';
@@ -35,8 +37,17 @@ try {
             if (!is_string($password) || $password !== ($_POST['password_confirm'] ?? null)) {
                 throw new InvalidArgumentException('The two passwords must match.');
             }
-            admin_sign_in(admin_set_password($password));
-            admin_redirect();
+            $newHash = $localSetup ? admin_set_password($password) : admin_setup_online($password, $_POST['setup_key'] ?? null);
+            if ($newHash === '') {
+                http_response_code(403);
+                $error = 'The setup key is incorrect. Copy it from your private configuration and try again.';
+            } else {
+                admin_sign_in($newHash);
+                if (!$localSetup) {
+                    $_SESSION['notice'] = 'Admin login created. Remove admin_setup_key from your private configuration; future visits use your admin password.';
+                }
+                admin_redirect();
+            }
         } elseif ($action === 'login' && !$setup) {
             if (!is_string($_POST['password'] ?? null) || !admin_login($_POST['password'])) {
                 http_response_code(401);

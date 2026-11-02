@@ -10,7 +10,7 @@ function app_config(): array
     $config = [
         'db_host' => '127.0.0.1', 'db_port' => '3306', 'db_name' => '',
         'db_user' => '', 'db_password' => '', 'db_socket' => '', 'db_ssl_ca' => '',
-        'write_token' => '', 'base_path' => null,
+        'write_token' => '', 'base_path' => null, 'admin_setup_key' => '',
     ];
     $path = getenv('CHEMAPP_CONFIG') ?: dirname(__DIR__) . '/config.php';
     if (is_file($path)) {
@@ -20,7 +20,7 @@ function app_config(): array
         }
         $config = array_replace($config, $local);
     }
-    foreach (['db_host', 'db_port', 'db_name', 'db_user', 'db_password', 'db_socket', 'db_ssl_ca', 'write_token', 'base_path'] as $key) {
+    foreach (['db_host', 'db_port', 'db_name', 'db_user', 'db_password', 'db_socket', 'db_ssl_ca', 'write_token', 'base_path', 'admin_setup_key'] as $key) {
         $env = getenv('CHEMAPP_' . strtoupper($key));
         if ($env !== false) {
             $config[$key] = $env;

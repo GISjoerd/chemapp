@@ -19,13 +19,19 @@
     <div class="manager-card manager-login">
       <?php if ($setup && !$setupAllowed): ?>
         <h2>Admin setup required</h2>
-        <p>Set the admin password from a private terminal with <code>php bin/set-admin-password.php</code>, or set it up while running the site locally. See the setup guide in the README.</p>
+        <p>To choose your admin password online, open this page using HTTPS and configure a private setup key first. In your hosting control panel, add <code>admin_setup_key</code> to your private <code>config.php</code>, using a random key of 32–128 letters, numbers, hyphens or underscores. Then reload this page. See the online setup instructions in the README.</p>
+        <p>You can also use the private terminal command <code>php bin/set-admin-password.php</code>, or transfer credentials from a local installation.</p>
       <?php else: ?>
         <h2><?= $setup ? 'Choose your admin password' : 'Log in' ?></h2>
         <p><?= $setup ? 'Use this password to add and edit tour dates. It is separate from your MySQL password.' : 'Enter your show manager password to continue.' ?></p>
         <form method="post" action="<?= e(page_url('manage')) ?>">
           <input type="hidden" name="csrf" value="<?= e($_SESSION['csrf'] ?? '') ?>">
           <input type="hidden" name="action" value="<?= $setup ? 'setup' : 'login' ?>">
+          <?php if ($setup && !$localSetup): ?>
+            <label for="admin-setup-key">Private setup key</label>
+            <input id="admin-setup-key" type="password" name="setup_key" required maxlength="128" autocomplete="off">
+            <p class="manager-hint">Enter the key from your private configuration. It is used only to create the first admin account. After setup, remove the key from your configuration.</p>
+          <?php endif; ?>
           <label for="admin-password">Password</label>
           <input id="admin-password" type="password" name="password" required <?= $setup ? 'minlength="12"' : '' ?> autocomplete="<?= $setup ? 'new-password' : 'current-password' ?>" autofocus>
           <?php if ($setup): ?>

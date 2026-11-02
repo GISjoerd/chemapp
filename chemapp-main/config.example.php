@@ -11,5 +11,6 @@ return [
     'db_socket' => '',        // Optional Unix socket; overrides db_host/db_port.
     'db_ssl_ca' => '',        // CA file for a remote TLS database, if required.
     'write_token' => '',      // Empty disables POST. Set a long random secret to enable.
+    'admin_setup_key' => '',  // Optional one-time HTTPS admin setup: 32–128 random A-Z/a-z/0-9/_/- characters. Remove after setup.
     'base_path' => null,      // null autodetects; use '/band' if installed under /band/.
 ];
