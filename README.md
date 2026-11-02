@@ -113,6 +113,7 @@ A private `config.php` is simplest for shared hosting. Environment variables ove
 | Optional Unix socket | `CHEMAPP_DB_SOCKET` |
 | Optional database TLS CA file | `CHEMAPP_DB_SSL_CA` |
 | Optional private API write token | `CHEMAPP_WRITE_TOKEN` |
+| Optional one-time HTTPS admin setup key | `CHEMAPP_ADMIN_SETUP_KEY` |
 | URL prefix, e.g. `/band` | `CHEMAPP_BASE_PATH` |
 | Alternate private config file | `CHEMAPP_CONFIG` |
 
@@ -169,7 +170,7 @@ Poster links must point to an image accessible over HTTP(S); this form does not 
 
 PHP creates `chemapp-main/storage/admin.json` with a password hash and login-attempt counters. Keep **the entire `storage/` directory outside the public document root**, alongside `src/` and `config.php`, and do not commit it. PHP must be able to write it. For the fixed `public_html` layout, it belongs in `chemapp-private/storage/`. Never set the document root to the application folder.
 
-Browser password setup is allowed only when **both** the direct client address and request hostname are loopback addresses (`127.0.0.1`, `localhost`, or `::1`). Forwarded headers do not enable setup. Before putting the manager online, either transfer your locally created private `storage/` directory securely, or run this on the destination server from the application directory:
+Local browser password setup is allowed when **both** the direct client address and request hostname are loopback addresses (`127.0.0.1`, `localhost`, or `::1`). Public browser setup requires HTTPS and a private setup key, as described below. Forwarded headers do not enable setup. Alternatively, transfer your locally created private `storage/` directory securely, or run this on the destination server from the application directory:
 
 ```sh
 php bin/set-admin-password.php
@@ -178,6 +179,24 @@ php bin/set-admin-password.php
 It prompts twice for a password and can also reset a forgotten password. Input is visible, so use a private terminal. Resetting it invalidates existing manager sessions. Do not delete the credential file as a reset method on a public site. Use HTTPS when logging in online. If TLS terminates at a proxy, configure the web server so PHP correctly receives `HTTPS=on` for secure cookies; the application does not trust arbitrary forwarded headers.
 
 Sessions use HttpOnly, SameSite=Strict cookies and expire after 30 minutes of inactivity or eight hours total. Forms require a session CSRF token; only logged-in sessions can save or delete shows. Deletion requires a POST with explicit confirmation; opening a link never deletes a show. Login allows ten failed attempts per five-minute window across the installation, then responds with a temporary lockout. API write tokens and admin passwords are independent.
+
+### First-time admin setup online (Argeweb / Plesk)
+
+You can set up the admin login directly on your live HTTPS website without finding or transferring a local storage folder. This applies only when no admin password exists yet. The existing password login is unchanged after setup.
+
+1. Update `src/` and `views/` on the hosting account, preserving the hosting `config.php` and any existing `storage/`. For the Plesk layout used here, upload them into `domains/chemicalclouds.nl/chemapp-private/`, beside `public_html/`. Keep the hosted `public_html/index.php` pointing to that private directory. This update requires no public-file changes or database migration.
+2. Generate a fresh setup key on your own computer. In Windows PowerShell:
+
+   ```powershell
+   & "C:\Program Files (x86)\PHP\php.exe" -r "echo bin2hex(random_bytes(32)), PHP_EOL;"
+   ```
+
+   The output is a new 64-character secret. Keep it private; do not use a sample value, your database password or your eventual admin password.
+3. In Plesk's text/code editor, add `'admin_setup_key' => 'PASTE_YOUR_RANDOM_SETUP_KEY_HERE',` inside the returned array in `chemapp-private/config.php`. Keep the existing database settings. A key must contain 32–128 characters chosen from letters, digits, hyphens and underscores. `CHEMAPP_ADMIN_SETUP_KEY` is also supported as an environment variable.
+4. Open `https://chemicalclouds.nl/index.php?page=manage`. Enter the setup key and choose/confirm a new admin password (12–72 bytes). Click **Set password and continue**. PHP creates `chemapp-private/storage/admin.json` automatically, stores a password hash and signs you in. The hosting PHP user must be allowed to create/write this private directory; do not make it publicly accessible.
+5. Remove the `admin_setup_key` entry from your private configuration (or set it to an empty string) after successful setup. The existing credential file already prevents repeating setup, even if the key remains configured. Future visits use **only your admin password**. You can now add, edit and delete shows online; changes affect the hosting database immediately.
+
+The setup key is submitted only in a POST body, never in a URL, hidden field or rendered response. Setup uses the same CSRF protection and installation-wide attempt limit as login. A configured key cannot reset an existing admin password. Existing CLI password reset remains available. Never commit a real key or remove a live credential file to reset access.
 
 ## Upcoming and past tour dates
 
